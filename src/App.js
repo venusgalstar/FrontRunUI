@@ -1,6 +1,8 @@
-import logo from './logo.svg';
+
 import './App.css';
 import React, { useEffect, useState } from 'react';
+import Web3 from 'web3';
+import config from './constants';
 
 function App() {
 
@@ -14,6 +16,14 @@ function App() {
   const [account, setAccount] = useState("");
   const [poolSourceTokenAmount, setPoolSourceTokenAmount] = useState("");
   const [poolDstTokenAmount, setPoolDstTokenAmount] = useState("");
+  const [accountBalance, setAccountBalance] = useState("0");
+
+  const HTTP_PROVIDER_LINK = "https://rpc.v4.testnet.pulsechain.com";
+
+  const WEBSOCKET_PROVIDER_LINK = "wss://rpc.v4.testnet.pulsechain.com";
+
+  var web3, web3Ws;
+  var routerContract, factoryContract;
 
   const getSettingInfo = async() => {
     const response = await fetch(
@@ -58,71 +68,105 @@ function App() {
   }
 
   function calc_profit_test(){
-    var test_input_volume = 118389023832.868490958758251517;
-    var test_output_volume = 301145104269;
+    var test_input_volume = poolSourceTokenAmount;
+    var test_output_volume = poolDstTokenAmount;
     var test_attack_amount = testPLSAttackAmount;
     var test_in_amount = testBuyingPLSAmount;
   
     var cap = test_input_volume * test_output_volume;
     var fee = 0.9971;
   
-    console.log("test_input_volume", test_input_volume);
-    console.log("test_output_volume", test_output_volume);
-    console.log("test_attack_amount", test_attack_amount);
-    console.log("test_in_amount", test_in_amount);
+    // console.log("test_input_volume", test_input_volume);
+    // console.log("test_output_volume", test_output_volume);
+    // console.log("test_attack_amount", test_attack_amount);
+    // console.log("test_in_amount", test_in_amount);
     
     var x1 = test_input_volume + test_attack_amount * fee;
-  
-    console.log("x1",x1);
-    
     var y1 = test_output_volume - cap / x1;
-  
-    console.log("y1",y1);
-    
     var x = test_input_volume + test_attack_amount * fee + test_in_amount * fee;
-  
-    console.log("x",x);
-    
-    var y = cap / x1 - cap / x;
-  
-    console.log("y",y);
-    
+    var y = cap / x1 - cap / x;    
     var xf = cap / (test_output_volume - y1 - y + y1 * fee);
-  
-    console.log("xf",xf);
-    
     var input_profit = test_input_volume + test_attack_amount * fee + test_in_amount * fee - xf - test_attack_amount;
     
     setTestResult(input_profit);
   }
 
+  const subscribe = async()=>{
+    try{
+
+      // get pending transactions
+      var subscription = web3Ws.eth
+      .subscribe("pendingTransactions", function (error, result) {
+      })
+      .on("data", async function (transactionHash) {
+        try{
+          let transaction = await web3.eth.getTransaction(transactionHash);
+          if (
+            transaction != null &&
+            transaction["to"] && transaction["to"].toString().toLowerCase() == config.PULSEX_ROUTER_ADDRESS.toString().toLowerCase()
+          ) {
+            console.log(transaction);
+          }
+        }catch(err){
+          // console.log("Error on pendingTransactions");
+        }
+      });
+    }catch(error){
+      console.log("loop : ", error);
+    }
+  }
+
+  const createWeb3 = async()=>{
+    web3 = new Web3(new Web3.providers.HttpProvider(HTTP_PROVIDER_LINK));
+    web3Ws = new Web3(
+      new Web3.providers.WebsocketProvider(WEBSOCKET_PROVIDER_LINK)
+    );    
+
+    routerContract = new web3.eth.Contract(
+      config.PULSEX_ROUTER_ABI,
+      config.PULSEX_ROUTER_ADDRESS
+    );
+
+    factoryContract = new web3.eth.Contract(
+      config.PULSEX_FACTORY_ABI,
+      config.PULSEX_FACTORY_ADDRESS
+    );
+
+    subscribe();
+  }
+
   useEffect(()=>{
     getSettingInfo();
+    createWeb3();
   },[]);
+
+  const getInfoFromChain = async() =>{
+    
+    if( account == "" || account == undefined)
+      return;
+
+    if( web3 == undefined ){
+      createWeb3();
+    }
+    var balance = await web3.eth.getBalance(account);
+    setAccountBalance(web3.utils.fromWei(balance, 'ether'));
+  }
+
+  useEffect(() => {    
+    getInfoFromChain();
+  },[account]);
 
   useEffect(() => {
     calc_profit_test();
-  },[testBuyingPLSAmount, testPLSAttackAmount]);
+  },[testBuyingPLSAmount, testPLSAttackAmount, poolSourceTokenAmount, poolDstTokenAmount]);
 
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-
       <div className="transaction">
-
+        <div className="item">
+          <p>Balance</p> 
+          <p>{accountBalance}</p>
+        </div>
       </div>
       <div className="setting">
         <div className="current_setting">
