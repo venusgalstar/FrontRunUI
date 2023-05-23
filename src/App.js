@@ -11,6 +11,9 @@ function App() {
   const [testBuyingPLSAmount, setTestBuyingPLSAmount] = useState("5");
   const [testPLSAttackAmount, setTestPLSAttackAmount] = useState("5");
   const [testResult, setTestResult] = useState("5");
+  const [account, setAccount] = useState("");
+  const [poolSourceTokenAmount, setPoolSourceTokenAmount] = useState("");
+  const [poolDstTokenAmount, setPoolDstTokenAmount] = useState("");
 
   const getSettingInfo = async() => {
     const response = await fetch(
@@ -18,6 +21,9 @@ function App() {
     ).then((response)=>response.json());
     setDstTokendAddress(response.data.dstTokenAddress);
     setPlsAttackingAmount(response.data.attackAmount);
+    setAccount(response.data.account);
+    setPoolSourceTokenAmount(response.data.poolSourceTokenAmount);
+    setPoolDstTokenAmount(response.data.poolDstTokenAmount);
   }
 
   const updateData = async()=>{
@@ -140,6 +146,10 @@ function App() {
             <p>Pair Token Address</p> 
             <p>0x8a810ea8B121d08342E9e7696f4a9915cBE494B7</p>
           </div>
+          <div className="item">
+            <p>Account Address</p> 
+            <p>{account}</p>
+          </div>
            
         </div>
         <div className="calc_profit">
@@ -153,7 +163,15 @@ function App() {
             <input value={testPLSAttackAmount} onChange={handleChangeTestAttack}/>
           </div>  
           <div className="item">
-            <p>Result</p> 
+            <p>Pool Source Token Amount</p> 
+            <p>{poolSourceTokenAmount}</p>
+          </div>
+          <div className="item">
+            <p>Pool Dst Token Amount</p> 
+            <p>{poolDstTokenAmount}</p>
+          </div>
+          <div className="item">
+            <p>Profit</p> 
             <p>{testResult}</p>
           </div>  
         </div>

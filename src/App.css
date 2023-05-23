@@ -42,14 +42,14 @@
 }
 
 .setting{
-  background-color: #282c34;
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: right;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
   width: 70%;
 }
 
