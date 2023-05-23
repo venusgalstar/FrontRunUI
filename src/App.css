@@ -85,10 +85,20 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  margin-bottom: 10px;
 }
 
 p{
-  margin: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+input{
+  height: 20px;
+  margin-top: 10px;
+  width: 400px;
 }
 @keyframes App-logo-spin {
   from {
