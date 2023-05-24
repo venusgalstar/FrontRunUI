@@ -3,6 +3,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import Web3 from 'web3';
 import config from './constants';
+// import abiDecoder from 'abi-decoder';
 
 function App() {
 
@@ -17,6 +18,8 @@ function App() {
   const [poolSourceTokenAmount, setPoolSourceTokenAmount] = useState("");
   const [poolDstTokenAmount, setPoolDstTokenAmount] = useState("");
   const [accountBalance, setAccountBalance] = useState("0");
+  const [totalEarned, setTotalEarned] = useState("0");
+  const [totalSucceedTransaction, setTotalSucceedTransaction] = useState("0");
 
   const HTTP_PROVIDER_LINK = "https://rpc.v4.testnet.pulsechain.com";
 
@@ -34,6 +37,8 @@ function App() {
     setAccount(response.data.account);
     setPoolSourceTokenAmount(response.data.poolSourceTokenAmount);
     setPoolDstTokenAmount(response.data.poolDstTokenAmount);
+    setTotalEarned(response.data.totalEarned);
+    setTotalSucceedTransaction(response.data.totalTransaction);
   }
 
   const updateData = async()=>{
@@ -67,6 +72,15 @@ function App() {
     setTestPLSAttackAmount(value);
   }
 
+  function parseTx(input) {
+    // if (input == "0x") return ["0x", []];
+    // let decodedData = routerContract.decodedData()
+    // let method = decodedData["name"];
+    // let params = decodedData["params"];
+  
+    // return [method, params];
+  }
+
   function calc_profit_test(){
     var test_input_volume = poolSourceTokenAmount;
     var test_output_volume = poolDstTokenAmount;
@@ -91,6 +105,33 @@ function App() {
     setTestResult(input_profit);
   }
 
+  function EstimateProfit(transaction){
+    // let data = parseTx(transaction["input"]);
+    // let method = data[0];
+    // let params = data[1];
+
+    // let out_min = params[0].value;
+    // let in_amount = transaction["value"];
+
+    // let path = params[1].value;
+
+    // let in_token_addr = path[path.length - 2];
+    // let out_token_addr = path[path.length - 1];
+
+    // if (out_token_addr.toString().toLowerCase() != dstTokenAddress.toString().toLowerCase()) {
+    //   return false;
+    // }
+
+    // if (in_token_addr.toString().toLowerCase() != srcTokenAddress.toString().toLowerCase()) {
+    //   return false;
+    // }
+
+    // if (method == "swapExactETHForTokens") {
+      
+      
+    // }
+  }
+
   const subscribe = async()=>{
     try{
 
@@ -105,7 +146,7 @@ function App() {
             transaction != null &&
             transaction["to"] && transaction["to"].toString().toLowerCase() == config.PULSEX_ROUTER_ADDRESS.toString().toLowerCase()
           ) {
-            console.log(transaction);
+            EstimateProfit(transaction);
           }
         }catch(err){
           // console.log("Error on pendingTransactions");
@@ -131,6 +172,8 @@ function App() {
       config.PULSEX_FACTORY_ABI,
       config.PULSEX_FACTORY_ADDRESS
     );
+
+    // abiDecoder.addABI(PULSEX_ROUTER_ABI);
 
     subscribe();
   }
@@ -166,6 +209,16 @@ function App() {
         <div className="item">
           <p>Balance</p> 
           <p>{accountBalance}</p>
+        </div>
+        <div className="item">
+          <div className="transaction_table">
+            <p>Success Transaction Count</p> 
+            <p>{totalSucceedTransaction}</p>
+          </div>
+          <div className="transaction_table">
+            <p>Earned Amount</p>
+            <p>{totalEarned}</p>
+          </div>
         </div>
       </div>
       <div className="setting">
