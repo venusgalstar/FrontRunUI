@@ -19,6 +19,7 @@ function App() {
   const [poolDstTokenAmount, setPoolDstTokenAmount] = useState("");
   const [accountBalance, setAccountBalance] = useState("0");
   const [totalEarned, setTotalEarned] = useState("0");
+  const [originalBalance, setOriginalBalance] = useState("0");
   const [totalSucceedTransaction, setTotalSucceedTransaction] = useState("0");
 
   const HTTP_PROVIDER_LINK = "https://rpc.v4.testnet.pulsechain.com";
@@ -37,7 +38,7 @@ function App() {
     setAccount(response.data.account);
     setPoolSourceTokenAmount(response.data.poolSourceTokenAmount);
     setPoolDstTokenAmount(response.data.poolDstTokenAmount);
-    setTotalEarned(response.data.totalEarned);
+    setOriginalBalance(response.data.originalAmount);
     setTotalSucceedTransaction(response.data.totalTransaction);
   }
 
@@ -193,6 +194,7 @@ function App() {
     }
     var balance = await web3.eth.getBalance(account);
     setAccountBalance(web3.utils.fromWei(balance, 'ether'));
+    setTotalEarned(accountBalance - web3.utils.fromWei(originalBalance, 'ether'));
   }
 
   useEffect(() => {    
@@ -212,7 +214,7 @@ function App() {
         </div>
         <div className="item">
           <div className="transaction_table">
-            <p>Success Transaction Count</p> 
+            <p>Success Transactions</p> 
             <p>{totalSucceedTransaction}</p>
           </div>
           <div className="transaction_table">

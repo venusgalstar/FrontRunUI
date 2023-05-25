@@ -38,18 +38,18 @@
   /* justify-content: center; */
   font-size: calc(10px + 2vmin);
   color: white;
-  width: 30%;
+  width: 50%;
 }
 
 .transaction_table{
   background-color: #282c34;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: left;
   /* justify-content: center; */
   font-size: calc(10px + 2vmin);
   color: white;
-  width: 30%;
+  width: 50%;
 }
 
 .setting{
